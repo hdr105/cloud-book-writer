@@ -13,7 +13,11 @@ class BookController extends Controller
     public function index()
     {
         $books = Book::all();
-        return response()->json(['data' => $books]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Books retrieved successfully',
+            'data' => $books,
+        ]);
     }
 
     // API to store a new book
@@ -28,8 +32,8 @@ class BookController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors(),
-                'data' => null,
+                'message' => $validator->errors()->first(),
+                'data' => [],
             ], 400);
         }
 
@@ -39,8 +43,7 @@ class BookController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'User not found',
-                'errors' => null,
-                'data' => null,
+                'data' => [],
             ], 400);
         } else {
             $book = new Book([
@@ -54,7 +57,6 @@ class BookController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Book created successfully',
-                'errors' => null,
                 'data' => $book,
             ], 201);
         }
@@ -71,19 +73,16 @@ class BookController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Book not found',
-                'errors' => null,
-                'data' => null,
+                'data' => [],
             ], 404);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Book retrieved successfully',
-            'errors' => null,
             'data' => $book,
         ]);
     }
-
 
     // API to update an existing book
     public function update(Request $request, $id)
@@ -94,8 +93,7 @@ class BookController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Book not found',
-                'errors' => null,
-                'data' => null,
+                'data' => [],
             ], 404);
         }
 
@@ -107,9 +105,8 @@ class BookController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-                'data' => null,
+                'message' => $validator->errors()->first(),
+                'data' => [],
             ], 400);
         }
 
@@ -118,8 +115,7 @@ class BookController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
-                'errors' => null,
-                'data' => null,
+                'data' => [],
             ], 403);
         }
 
@@ -131,11 +127,9 @@ class BookController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Book updated successfully',
-            'errors' => null,
             'data' => $book,
         ], 200);
     }
-
 
     // API to delete an existing book
     public function destroy($id)
@@ -146,8 +140,7 @@ class BookController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Book not found',
-                'errors' => null,
-                'data' => null,
+                'data' => [],
             ], 404);
         }
 
@@ -156,8 +149,7 @@ class BookController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
-                'errors' => null,
-                'data' => null,
+                'data' => [],
             ], 403);
         }
 
@@ -166,8 +158,7 @@ class BookController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Book has been deleted successfully',
-            'errors' => null,
-            'data' => null,
+            'data' => [],
         ], 200);
     }
 }
