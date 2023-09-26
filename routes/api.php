@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\BookController;
+use App\Http\Controllers\api\v1\SectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,20 +17,34 @@ use App\Http\Controllers\Api\v1\BookController;
 */
 
 Route::prefix('v1')->group(function () {
-    Route::middleware(['auth:api'])->group(function () {
-
-        // Use Route::apiResource for CRUD operations if needed
-        Route::post('/add', [BookController::class, 'store']);
-        Route::get('/view', [BookController::class, 'show']); // Changed to GET for viewing
-        Route::put('/edit/{id}', [BookController::class, 'update']); // Use PUT for updates
-        Route::delete('/delete/{id}', [BookController::class, 'destroy']); // Use DELETE for deletions
+    //---------------------------------------------------------------------------------------------------------//
+    Route::prefix('auth')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::prefix('forgot')->group(function () {
+            Route::post('/send-reset-otp', [AuthController::class, 'send_reset_otp']);
+            Route::post('/verify-otp', [AuthController::class, 'verify_otp']);
+            Route::post('/reset', [AuthController::class, 'reset']);
+        });
     });
-    
-    Route::post('/signup', [AuthController::class, 'signup']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/sendresetotp', [AuthController::class, 'sendResetOtp']);
-    Route::post('/verifyotp', [AuthController::class, 'verifyOtp']);
-    Route::post('/passwordreset', [AuthController::class, 'reset']);
-    Route::post('/deleteaccount', [AuthController::class, 'accountDelete']);
+    //---------------------------------------------------------------------------------------------------------//
+    Route::middleware(['auth:api'])->group(function () {
+        Route::prefix('books')->group(function () {
+            Route::post('/add', [BookController::class, 'store']);
+            Route::get('/view', [BookController::class, 'show']);
+            Route::put('/edit/{id}', [BookController::class, 'update']);
+            Route::delete('/delete/{id}', [BookController::class, 'destroy']);
+        });
+    //---------------------------------------------------------------------------------------------------------//
+        Route::prefix('section')->middleware(['auth:api'])->group(function () {
+            Route::post('/add', [SectionController::class, 'section_store']);
+            Route::post('/update', [SectionController::class, 'section_update']);
+        });
+    //---------------------------------------------------------------------------------------------------------//
+        Route::prefix('subsection')->middleware(['auth:api'])->group(function () {
+            Route::post('/add', [SectionController::class, 'sub_section_store']);
+        });
+    //---------------------------------------------------------------------------------------------------------//
+    });
 });
 

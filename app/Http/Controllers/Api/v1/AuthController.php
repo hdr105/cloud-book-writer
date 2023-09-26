@@ -19,7 +19,51 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {   
-    // API for LOGIN (OK)
+    public function register(Request $request){
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'data'    => [],
+            ]);
+        }
+
+        // Create a new user with the provided data
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Assign the "Collaborator" role if it exists
+        $collaboratorRole = Role::where('name', 'Collaborator')->first();
+        if ($collaboratorRole) {
+            $user->assignRole($collaboratorRole);
+        }
+
+        // Fire the Registered event
+        event(new Registered($user));
+
+        // Generate an access token for the user
+        $token = $user->createToken('MyAppToken')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Signup Successfully',
+            'data'    => [
+                'user' => $user,
+                'token' => $token,
+            ],
+        ]);
+    }
+
     public function login(Request $request) {
         $request->merge(['email' => strtolower($request->email)]);
         
@@ -75,54 +119,7 @@ class AuthController extends Controller
         }
     }
 
-    // API for SIGNUP (OK)
-    public function signup(Request $request){
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first(),
-                'data'    => [],
-            ]);
-        }
-
-        // Create a new user with the provided data
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Assign the "Collaborator" role if it exists
-        $collaboratorRole = Role::where('name', 'Collaborator')->first();
-        if ($collaboratorRole) {
-            $user->assignRole($collaboratorRole);
-        }
-
-        // Fire the Registered event
-        event(new Registered($user));
-
-        // Generate an access token for the user
-        $token = $user->createToken('MyAppToken')->accessToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Signup Successfully',
-            'data'    => [
-                'user' => $user,
-                'token' => $token,
-            ],
-        ]);
-    }
-
-    // PassChange-API-1 to send OTP via email (OK)
-    public function sendResetOtp(Request $request)
+    public function send_reset_otp(Request $request)
     {
 
         $credentials = $request->only(['email']);
@@ -178,8 +175,7 @@ class AuthController extends Controller
         }
     }
 
-    // PassChange-API-2 to verify sent otp (OK)
-    public function verifyOtp(Request $request) {
+    public function verify_otp(Request $request) {
         $credentials = $request->only(['email','otp']);
 
         $validator = Validator::make($credentials,[
@@ -234,7 +230,6 @@ class AuthController extends Controller
         }
     }
 
-    // PassChange-API-3 to reset Password (OK)
     public function reset(Request $request) {
         $credentials = $request->only(['email','password']);
 
@@ -301,7 +296,6 @@ class AuthController extends Controller
         }
     }
 
-    // API to delete existing table (OK)
     public function accountDelete(Request $request) {
         $credentials = $request->only(['email','password']);
 
