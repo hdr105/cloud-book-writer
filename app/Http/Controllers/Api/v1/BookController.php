@@ -7,9 +7,24 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Info(
+ *     title="BookStore CRUD API",
+ *     version="1.0",
+ *     description="This is a simple API documentation for demonstration of CRUD operation of Bookstore.",
+ *     @OA\Contact(
+ *         name="Mian Umar",
+ *         email="mdumar.bitsclan@gmail.com"
+ *     )
+ * )
+ */
+
 
 class BookController extends Controller
 {
+
     public function index()
     {
         $books = Book::all();
@@ -20,6 +35,43 @@ class BookController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/v1/books/add",
+     *     operationId="createBook",
+     *     tags={"Books"},
+     *     summary="Create a new book",
+     *     description="Creates a new book record",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"title","description","user_id"},
+     *                  @OA\Property(property="title", type="string", example="Sample Book"),
+     *                  @OA\Property(property="description", type="string", example="A brief description of the book."),
+     *                  @OA\Property(property="user_id", type="integer", example=1),
+     *              )
+     *         ),     
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Book created successfully",
+     *         @OA\JsonContent(),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(type="object", @OA\Property(property="message", type="string")),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     * )
+     */
+    
     // API to store a new book
     public function store(Request $request)
     {
@@ -62,6 +114,32 @@ class BookController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/books/view",
+     *     operationId="getBook",
+     *     tags={"Books"},
+     *     summary="Get a specific book",
+     *     description="Retrieves information about a specific book",
+     *     @OA\Parameter(
+     *         name="book_id",
+     *         in="query",
+     *         required=true,
+     *         description="ID of the book to retrieve",
+     *         @OA\Schema(type="integer", format="int64", example=1),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Book retrieved successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Book not found",
+     *     ),
+     * )
+     */
+
+
     // API to view an existing book
     public function show(Request $request)
     {
@@ -83,6 +161,54 @@ class BookController extends Controller
             'data' => $book,
         ]);
     }
+    
+     /**
+     * @OA\Put(
+     *     path="/api/v1/books/edit/{book_id}",
+     *     operationId="updateBook",
+     *     tags={"Books"},
+     *     summary="Update a specific book",
+     *     description="Updates information about a specific book",
+     *     @OA\Parameter(
+     *         name="book_id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the book to update",
+     *         @OA\Schema(type="integer", format="int64", example=1),
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Updated book data",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", example="Updated Book Title"),
+     *             @OA\Property(property="description", type="string", example="Updated description."),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Book updated successfully",
+     *         @OA\JsonContent(),
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(),
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden (not the book owner)",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Book not found",
+     *     ),
+     * )
+     */
+
 
     // API to update an existing book
     public function update(Request $request, $id)
@@ -130,6 +256,39 @@ class BookController extends Controller
             'data' => $book,
         ], 200);
     }
+
+ /**
+     * @OA\Delete(
+     *     path="/api/v1/books/delete/{book_id}",
+     *     operationId="deleteBook",
+     *     tags={"Books"},
+     *     summary="Delete a specific book",
+     *     description="Deletes a specific book",
+     *     @OA\Parameter(
+     *         name="book_id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the book to delete",
+     *         @OA\Schema(type="integer", format="int64", example=1),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Book deleted successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden (not the book owner)",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Book not found",
+     *     ),
+     * )
+     */
 
     // API to delete an existing book
     public function destroy($id)

@@ -1,0 +1,166 @@
+openapi: 3.0.3
+info:
+  title: BookStore CRUD API
+  version: 1.0
+  description: This is a simple API documentation for demonstration of CRUD operation of Bookstore.
+  contact:
+    name: Mian Umar
+    email: mdumar.bitsclan@gmail.com
+
+paths:
+  /api/books:
+    get:
+      operationId: getBooksList
+      tags:
+        - Books
+      summary: Get list of books
+      description: Returns a list of books
+      responses:
+        '200':
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+        '401':
+          description: Unauthorized
+
+  /api/books:
+    post:
+      operationId: storeBook
+      tags:
+        - Books
+      summary: Store a new book
+      description: Creates a new book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '201':
+          description: Book created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+
+  /api/books/{id}:
+    get:
+      operationId: getBook
+      tags:
+        - Books
+      summary: Get an existing book
+      description: Returns an existing book
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Book retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Book not found
+
+  /api/books/{id}:
+    put:
+      operationId: updateBook
+      tags:
+        - Books
+      summary: Update an existing book
+      description: Updates an existing book
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Book not found
+
+  /api/books/{id}:
+    delete:
+      operationId: destroyBook
+      tags:
+        - Books
+      summary: Delete an existing book
+      description: Deletes an existing book
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Book has been deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Book not found
+
+
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        author_id:
+          type: integer
+          format: int64
+    
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string

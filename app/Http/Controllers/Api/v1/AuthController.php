@@ -15,11 +15,53 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Annotations as OA;
 
+// /**
+//  * @OA\Info(
+//  *     title="BookStore Authentication Services",
+//  *     version="1.0",
+//  *     description="This is a simple API documentation for demonstration of Authentication Services for cloud-based Bookstore.",
+//  *     @OA\Contact(
+//  *         name="Mian Umar",
+//  *         email="mdumar.bitsclan@gmail.com"
+//  *     )
+//  * )
+//  */
 
 class AuthController extends Controller
-{   
-    public function register(Request $request){
+{
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/auth/register",
+     *     operationId="registerUser",
+     *     tags={"Authentication"},
+     *     summary="Register a new user",
+     *     description="Registers a new user and returns an access token.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User data",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User registered successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *     ),
+     * )
+     */
+
+    public function register(Request $request)
+    {
         // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -64,12 +106,39 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request) {
+    /**
+     * @OA\Post(
+     *     path="/api/v1/auth/login",
+     *     operationId="loginUser",
+     *     tags={"Authentication"},
+     *     summary="Login as a user",
+     *     description="Logs in a user and returns an access token.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Login credentials",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User logged in successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *     ),
+     * )
+     */
+
+    public function login(Request $request)
+    {
         $request->merge(['email' => strtolower($request->email)]);
-        
+
         $credentials = $request->only(['email', 'password']);
 
-        $validator = Validator::make($credentials,[
+        $validator = Validator::make($credentials, [
             'email'    => 'required|email|max:255',
             'password' => 'required|min:8',
         ]);
@@ -83,7 +152,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request['email'])->first();
-        if(!$user) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => "User not Found!",
@@ -91,7 +160,7 @@ class AuthController extends Controller
             ]);
         } else {
             $token = $user->createToken('MyAppToken22')->plainTextToken;
-    
+
             if ($user) {
                 if (!Auth::attempt($credentials)) {
                     return response()->json([
@@ -108,7 +177,7 @@ class AuthController extends Controller
                             "token" => $token,
                         ],
                     ]);
-                } 
+                }
             } else {
                 return response()->json([
                     "success" => false,
@@ -118,6 +187,35 @@ class AuthController extends Controller
             }
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/auth/forgot/send-reset-otp",
+     *     operationId="sendResetOTP",
+     *     tags={"Authentication"},
+     *     summary="Send a reset OTP",
+     *     description="Sends a one-time password (OTP) to the user's email for password reset.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User email",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP sent successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *     ),
+     * )
+     */
 
     public function send_reset_otp(Request $request)
     {
@@ -175,10 +273,41 @@ class AuthController extends Controller
         }
     }
 
-    public function verify_otp(Request $request) {
-        $credentials = $request->only(['email','otp']);
+    /**
+     * @OA\Post(
+     *     path="/api/v1/auth/forgot/verify-otp",
+     *     operationId="verifyOTP",
+     *     tags={"Authentication"},
+     *     summary="Verify OTP",
+     *     description="Verifies the one-time password (OTP) sent to the user's email.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User email and OTP",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="otp", type="integer", example=123456),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP verified successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found or OTP expired",
+     *     ),
+     * )
+     */
 
-        $validator = Validator::make($credentials,[
+    public function verify_otp(Request $request)
+    {
+        $credentials = $request->only(['email', 'otp']);
+
+        $validator = Validator::make($credentials, [
             'email' => 'required|email|exists:users',
             'otp'   => 'required|integer|digits:6',
         ]);
@@ -192,16 +321,16 @@ class AuthController extends Controller
         }
 
         $passwordReset = PasswordReset::where([
-                    'email' => $request->email, 
-                    'otp' => $request->otp
-                ])->first();
+            'email' => $request->email,
+            'otp' => $request->otp
+        ])->first();
         if ($passwordReset) {
 
             $otpCreateTime = Carbon::parse($passwordReset->created_at);
             $now = Carbon::now();
             $diffInMinutes = $now->diffInMinutes($otpCreateTime);
-            if ( $diffInMinutes < 5) {
-                if ( $passwordReset->otp == $request->otp) {
+            if ($diffInMinutes < 5) {
+                if ($passwordReset->otp == $request->otp) {
                     return response()->json([
                         "success" => true,
                         "message" => "OTP verified!",
@@ -230,10 +359,41 @@ class AuthController extends Controller
         }
     }
 
-    public function reset(Request $request) {
-        $credentials = $request->only(['email','password']);
+    /**
+     * @OA\Post(
+     *     path="/api/v1/auth/forgot/reset",
+     *     operationId="resetPassword",
+     *     tags={"Authentication"},
+     *     summary="Reset password",
+     *     description="Resets the user's password using the provided OTP.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User email and new password",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="new_secret"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Password reset successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found or OTP expired",
+     *     ),
+     * )
+     */
 
-        $validator = Validator::make($credentials,[
+    public function reset(Request $request)
+    {
+        $credentials = $request->only(['email', 'password']);
+
+        $validator = Validator::make($credentials, [
             'email' => 'required|email|exists:users',
             'password' => 'required| min:8',
         ]);
@@ -248,7 +408,7 @@ class AuthController extends Controller
 
 
             $passwordReset = PasswordReset::where([
-                'email' => $request->email, 
+                'email' => $request->email,
             ])->first();
 
 
@@ -265,7 +425,7 @@ class AuthController extends Controller
                 $now = Carbon::now();
                 $diffInMinutes = $now->diffInMinutes($otpCreateTime);
 
-                if ( $diffInMinutes < 5) {
+                if ($diffInMinutes < 5) {
                     User::where('email', $request->email)->update([
                         'password' => Hash::make($request->password)
                     ]);
@@ -273,7 +433,7 @@ class AuthController extends Controller
                     DB::table('password_reset_tokens')->where([
                         'email' => $request->email
                     ])->delete();
-                    
+
                     return response()->json([
                         'success' => true,
                         'message' => "Password changed successfully!",
@@ -296,10 +456,38 @@ class AuthController extends Controller
         }
     }
 
-    public function accountDelete(Request $request) {
-        $credentials = $request->only(['email','password']);
 
-        $validator = Validator::make($credentials,[
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/auth/account-delete",
+     *     operationId="deleteUserAccount",
+     *     tags={"Authentication"},
+     *     summary="Delete user account",
+     *     description="Deletes the user account.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User credentials",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User account deleted successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *     ),
+     * )
+     */
+
+    public function accountDelete(Request $request)
+    {
+        $credentials = $request->only(['email', 'password']);
+
+        $validator = Validator::make($credentials, [
             'email' => 'required|email|exists:users',
             'password' => 'required| min:8',
         ]);
@@ -311,7 +499,7 @@ class AuthController extends Controller
                 'data'    => [],
             ]);
         } else {
-            $user = User::where('email' , $request->email)->first();
+            $user = User::where('email', $request->email)->first();
             if (!Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'success' => false,
@@ -328,5 +516,4 @@ class AuthController extends Controller
             }
         }
     }
-
 }
