@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\BookController;
 use App\Http\Controllers\Api\v1\AuthController;
-// use App\Http\Controllers\api\v1\SectionController;
+use App\Http\Controllers\api\v1\SectionController;
 use OpenApi\Annotations as OA;
 
 
@@ -35,7 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/delete', [AuthController::class, 'accountDelete']);
+        Route::post('/account-delete', [AuthController::class, 'accountDelete']);
         Route::prefix('forgot')->group(function () {
             Route::post('/send-reset-otp', [AuthController::class, 'send_reset_otp']);
             Route::post('/verify-otp', [AuthController::class, 'verify_otp']);
@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
         });
     });
     //---------------------------------------------------------------------------------------------------------//
-    Route::middleware(['auth:api'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('books')->group(function () {
             Route::post('/add', [BookController::class, 'store']);
             Route::get('/view', [BookController::class, 'show']);
@@ -51,12 +51,12 @@ Route::prefix('v1')->group(function () {
             Route::delete('/delete/{id}', [BookController::class, 'destroy']);
         });
     //---------------------------------------------------------------------------------------------------------//
-        Route::prefix('section')->middleware(['auth:api'])->group(function () {
+        Route::prefix('section')->group(function () {
             Route::post('/add', [SectionController::class, 'section_store']);
             Route::post('/update', [SectionController::class, 'section_update']);
         });
     //---------------------------------------------------------------------------------------------------------//
-        Route::prefix('subsection')->middleware(['auth:api'])->group(function () {
+        Route::prefix('subsection')->group(function () {
             Route::post('/add', [SectionController::class, 'sub_section_store']);
         });
     //---------------------------------------------------------------------------------------------------------//

@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Api\v1;
 use App\Models\Book;
 use App\Models\User;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use OpenApi\Annotations as OA;
 
 /**
  * @OA\Info(
@@ -24,7 +25,6 @@ use OpenApi\Annotations as OA;
 
 class BookController extends Controller
 {
-
     public function index()
     {
         $books = Book::all();
@@ -42,43 +42,50 @@ class BookController extends Controller
      *     tags={"Books"},
      *     summary="Create a new book",
      *     description="Creates a new book record",
+     *     security={ {"sanctum": {} }, {"X-XSRF-TOKEN": {}} },
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\MediaType(
      *              mediaType="application/json",
      *              @OA\Schema(
      *                  type="object",
-     *                  required={"title","description","user_id"},
+     *                  required={"title","description"},
      *                  @OA\Property(property="title", type="string", example="Sample Book"),
      *                  @OA\Property(property="description", type="string", example="A brief description of the book."),
-     *                  @OA\Property(property="user_id", type="integer", example=1),
      *              )
      *         ),     
      *     ),
+     * 
      *     @OA\Response(
      *         response=201,
      *         description="Book created successfully",
-     *         @OA\JsonContent(),
+     *         @OA\JsonContent(
+     *         )
      *     ),
+     * 
      *     @OA\Response(
      *         response=400,
      *         description="Bad Request",
-     *         @OA\JsonContent(type="object", @OA\Property(property="message", type="string")),
+     *         @OA\JsonContent()
      *     ),
      *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized",
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
      *     ),
      * )
      */
-    
+
     // API to store a new book
     public function store(Request $request)
     {
+        // Validate the request data
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
-            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -89,28 +96,33 @@ class BookController extends Controller
             ], 400);
         }
 
-        $user = User::find($request->user_id);
+        // Get the current user's ID
+        $user_id = auth()->user()->id;
 
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found',
-                'data' => [],
-            ], 400);
-        } else {
+        // Check if the user is authorized to create a book
+        if ($this->authorize('create-books')) {
+            // Create a new book instance
             $book = new Book([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
-                'author_id' => $request->user_id,
+                'author_id' => $user_id,
             ]);
 
+            // Save the book to the database
             $book->save();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Book created successfully',
+                "success" => true,
+                "message" => "Book added successfully",
+                "code" => 200,
                 'data' => $book,
-            ], 201);
+            ]);
+        } else {
+            return response()->json([
+                "success" => false,
+                "message" => "Permission Denied",
+                "code" => 403,
+            ]);
         }
     }
 
@@ -121,6 +133,7 @@ class BookController extends Controller
      *     tags={"Books"},
      *     summary="Get a specific book",
      *     description="Retrieves information about a specific book",
+     *     security={ {"sanctum": {} }},
      *     @OA\Parameter(
      *         name="book_id",
      *         in="query",
@@ -143,32 +156,34 @@ class BookController extends Controller
     // API to view an existing book
     public function show(Request $request)
     {
-        $id = $request->book_id;
+        try {
+            // Attempt to find the book by its ID; throws an exception if not found
+            $book = Book::findOrFail($request->book_id);
 
-        $book = Book::find($id);
-
-        if (!$book) {
+            // Return a JSON response with the found book
+            return response()->json([
+                'success' => true,
+                'message' => 'Book retrieved successfully',
+                'data' => $book,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle the exception if the book is not found and return a 404 response
             return response()->json([
                 'success' => false,
                 'message' => 'Book not found',
                 'data' => [],
             ], 404);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Book retrieved successfully',
-            'data' => $book,
-        ]);
     }
-    
-     /**
+
+    /**
      * @OA\Put(
      *     path="/api/v1/books/edit/{book_id}",
      *     operationId="updateBook",
      *     tags={"Books"},
      *     summary="Update a specific book",
      *     description="Updates information about a specific book",
+     *     security={ {"sanctum": {} }},
      *     @OA\Parameter(
      *         name="book_id",
      *         in="path",
@@ -213,8 +228,10 @@ class BookController extends Controller
     // API to update an existing book
     public function update(Request $request, $id)
     {
+        // Find the book by its ID
         $book = Book::find($id);
 
+        // If the book is not found, return a 404 response
         if (!$book) {
             return response()->json([
                 'success' => false,
@@ -223,11 +240,13 @@ class BookController extends Controller
             ], 404);
         }
 
+        // Validate the request data
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
         ]);
 
+        // If validation fails, return a 400 response with the first validation error message
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -245,11 +264,13 @@ class BookController extends Controller
             ], 403);
         }
 
+        // Update the book with the new data
         $book->update([
             'title' => $request->input('title'),
             'description' => $request->input('description'),
         ]);
 
+        // Return a success response with the updated book data
         return response()->json([
             'success' => true,
             'message' => 'Book updated successfully',
@@ -257,13 +278,15 @@ class BookController extends Controller
         ], 200);
     }
 
- /**
+
+    /**
      * @OA\Delete(
      *     path="/api/v1/books/delete/{book_id}",
      *     operationId="deleteBook",
      *     tags={"Books"},
      *     summary="Delete a specific book",
      *     description="Deletes a specific book",
+     *     security={ {"sanctum": {} }},
      *     @OA\Parameter(
      *         name="book_id",
      *         in="path",
@@ -312,6 +335,10 @@ class BookController extends Controller
             ], 403);
         }
 
+        // Delete the section of that book
+        DB::table('sections')->where([
+            'book_id' => $id
+        ])->delete();
         $book->delete();
 
         return response()->json([

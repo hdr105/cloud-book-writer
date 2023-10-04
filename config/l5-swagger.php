@@ -165,6 +165,7 @@ return [
                     'name' => 'api_key', // The name of the header or query parameter to be used.
                     'in' => 'header', // The location of the API key. Valid values are "query" or "header".
                 ],
+                
                 'oauth2_security_example' => [ // Unique name of security
                     'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
                     'description' => 'A short description for oauth2 security scheme.',
@@ -198,6 +199,8 @@ return [
                     'description' => 'Enter token in format (Bearer <token>)',
                     'name' => 'Authorization', // The name of the header or query parameter to be used.
                     'in' => 'header', // The location of the API key. Valid values are "query" or "header".
+                    'scheme' => 'bearer',
+                    'bearerFormat' => 'JWT'
                 ],
                 /*
             ],
@@ -297,6 +300,7 @@ return [
          */
         'constants' => [
             'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
+            // 'X-CSRF-Token' => 'your-default-csrf-token-value',
         ],
     ],
 ];
