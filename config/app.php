@@ -169,6 +169,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
+
     ])->toArray(),
 
     /*
@@ -184,6 +186,12 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        'Swagger' => L5Swagger\Facades\Swagger::class,
+
     ])->toArray(),
 
+    'swagger-ui' => [
+        'csrf_protection' => true,
+        'assets_path' => '/swagger-ui/',
+    ],
 ];

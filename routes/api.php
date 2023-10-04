@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\BookController;
-use App\Http\Controllers\api\v1\SectionController;
+use App\Http\Controllers\Api\v1\AuthController;
+// use App\Http\Controllers\api\v1\SectionController;
+use OpenApi\Annotations as OA;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -16,11 +18,24 @@ use App\Http\Controllers\api\v1\SectionController;
 |
 */
 
+/**
+ * @OA\Info(
+ *     title="Cloud-based BookStore API",
+ *     version="1.0",
+ *     description="This is a simple API documentation for demonstration of CRUD operation of Bookstore.",
+ *     @OA\Contact(
+ *         name="Mian Umar",
+ *         email="mdumar.bitsclan@gmail.com"
+ *     )
+ * )
+ */
+
 Route::prefix('v1')->group(function () {
     //---------------------------------------------------------------------------------------------------------//
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/delete', [AuthController::class, 'accountDelete']);
         Route::prefix('forgot')->group(function () {
             Route::post('/send-reset-otp', [AuthController::class, 'send_reset_otp']);
             Route::post('/verify-otp', [AuthController::class, 'verify_otp']);
