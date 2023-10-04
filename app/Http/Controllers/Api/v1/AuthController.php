@@ -23,8 +23,8 @@ use OpenApi\Annotations as OA;
 //  *     version="1.0",
 //  *     description="This is a simple API documentation for demonstration of Authentication Services for cloud-based Bookstore.",
 //  *     @OA\Contact(
-//  *         name="Mian Umar",
-//  *         email="mdumar.bitsclan@gmail.com"
+//  *         name="Muhammad Haider",
+//  *         email="haadi.javaid@gmail.com"
 //  *     )
 //  * )
 //  */

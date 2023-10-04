@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Validator;
  *     version="1.0",
  *     description="This is a simple API documentation for demonstration of CRUD operation of Bookstore.",
  *     @OA\Contact(
- *         name="Mian Umar",
- *         email="mdumar.bitsclan@gmail.com"
+ *         name="Muhammad Haider",
+ *         email="haadi.javaid@gmail.com"
  *     )
  * )
  */
