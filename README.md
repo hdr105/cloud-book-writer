@@ -1,66 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Book Store Cloud
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+#### _About App_
+---
 
-## About Laravel
+Book Store Cloud is a web application built with Laravel PHP. A dynamic platform catering to two distinct user types: Authors and Collaborators. Authors are empowered to manage and showcase their literary works, while Collaborators can explore an extensive collection of books across genres. Both user types must register to unlock the platform's full potential, ensuring a secure and welcoming environment. We're dedicated to fostering a vibrant literary community, connecting authors with their readers, and celebrating the power of storytelling. Join us on this literary journey where words come to life, and stories find their readers.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **User Registration and Profiles:** Create personalized profiles, providing information about themselves, their literary works, and reading preferences.
+- **Book Management for Authors:** Can easily add, edit, and manage their books.
+- **Search and Browse:** can search for books by genre, author, title, or keywords.
+- **Author-Reader Interaction:** Authors can engage with their readers through comments, messages.
+- **Mobile Accessibility:** Can access anywhere and anytime.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Installation
+---
 
-## Learning Laravel
+### Prerequisites
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP (>= 8.1)
+- Laravel(>= 7.x)
+- Composer (>= 2.6)
+- npm (>= 9.0)
+- Laravel Sanctum (>= 3.0)
+- darkaonline/l5-swagger (>= 8.0)
+- swagger-ui (>= 5.0)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Clone the repository
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```sh
+git clone https://github.com/hdr105/cloud-book-writer
+```
 
-## Laravel Sponsors
+Navigate to the project directory
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```sh
+cd cloud-book-writer
+```
 
-### Premium Partners
+#### - Composer
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Install dependencies:
 
-## Contributing
+```sh
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### - NPM
 
-## Code of Conduct
+```sh
+npm install 
+npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### - Laravel Sanctum
 
-## Security Vulnerabilities
+Its time to install laravel sanctum:
+You may install Laravel Sanctum via the Composer package manager:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```sh
+composer require laravel/sanctum
+```
 
-## License
+Next, you should publish the Sanctum configuration
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```sh
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+```
+
+Finally, you should run your database migrations.
+
+```sh
+php artisan migrate
+```
+
+You can get detail [laravel sanctum](https://laravel.com/docs/10.x/sanctum) documentation here.
+
+#### - L5 Swagger
+
+Lets install darkonline/l5swagger:
+
+```sh
+composer require "darkaonline/l5-swagger"
+```
+
+Open your `AppServiceProvider` (located in `app/Providers`) and add this line in `register` function
+
+```sh
+$this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
+```
+
+or open your `config/app.php` and add this line in `providers` section
+
+```sh
+L5Swagger\L5SwaggerServiceProvider::class,
+```
+
+You can publish L5-Swagger's config:
+
+```sh
+$ php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
+```
+
+Files can be viewed into your project by running:
+
+```sh
+$ php artisan l5-swagger:generate
+```
+
+You can get detail [darkaonline/l5-swagger](https://github.com/DarkaOnLine/L5-Swagger/wiki) documentation here.
+
+#### - DB Seeding
+
+To generate a seeder, execute the `make:seeder` Artisan command. All seeders generated by the framework will be placed in the `database/seeders` directory:
+
+```sh
+$ php artisan make:seeder UserSeeder
+```
+
+### Environment Configuration
+---
+
+Configure environment variables:
+
+In `.env` file, Update the file with your own database credentials and other necessary configurations. Generate application key:
+
+```sh
+php artisan key:generate
+```
+
+Run migrations:
+
+```sh
+php artisan migrate
+```
+
+Start the local development server:
+
+```sh
+php artisan serve
+```
+
+Usage Create a new project and add tasks to it. Drag and drop tasks to change their priority. Edit or delete tasks as needed. Deployment Follow these steps to deploy the application on a server:
+
+Create a new database on your server and update the '`.env` file with the database credentials. Copy the project files to your server. Set proper file permissions to the required directories.
+
+Configure any necessary server-specific settings (e.g., environment variables, virtual hosts). Access the application through your server's domain or IP address.
+
+Contributions are welcome! Feel free to fork the repository and submit pull requests.
+
+### License 
+---
+
+This project is licensed under the MIT License. See the LICENSE file for more information.
