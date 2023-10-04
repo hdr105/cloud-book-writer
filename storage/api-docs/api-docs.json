@@ -27,7 +27,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "John Doe"
+                                        "example": "Collaborator John Doe"
                                     },
                                     "email": {
                                         "type": "string",
@@ -36,7 +36,7 @@
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "secret"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -71,12 +71,12 @@
                                 "properties": {
                                     "email": {
                                         "type": "string",
-                                        "example": "john@example.com"
+                                        "example": "author@example.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "secret"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -199,7 +199,7 @@
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "new_secret"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -221,7 +221,7 @@
             }
         },
         "/api/v1/auth/account-delete": {
-            "delete": {
+            "post": {
                 "tags": [
                     "Authentication"
                 ],
@@ -242,7 +242,7 @@
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "secret"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -275,8 +275,7 @@
                             "schema": {
                                 "required": [
                                     "title",
-                                    "description",
-                                    "user_id"
+                                    "description"
                                 ],
                                 "properties": {
                                     "title": {
@@ -286,10 +285,6 @@
                                     "description": {
                                         "type": "string",
                                         "example": "A brief description of the book."
-                                    },
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -310,21 +305,25 @@
                         "description": "Bad Request",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
+                                "schema": {}
                             }
                         }
                     },
-                    "401": {
+                    "403": {
                         "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {
+                        "X-XSRF-TOKEN": []
+                    }
+                ]
             }
         },
         "/api/v1/books/view": {
@@ -355,7 +354,12 @@
                     "404": {
                         "description": "Book not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/books/edit/{book_id}": {
@@ -426,7 +430,12 @@
                     "404": {
                         "description": "Book not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/books/delete/{book_id}": {
@@ -463,23 +472,32 @@
                     "404": {
                         "description": "Book not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/sections": {
+        "/api/v1/section/add": {
             "post": {
                 "tags": [
                     "Sections"
                 ],
                 "summary": "Create a new section",
-                "description": "Creates a new section within a book",
-                "operationId": "createSection",
+                "description": "Create a new section with the provided title, description, and book_id.",
+                "operationId": "storeSection",
                 "requestBody": {
-                    "description": "Section data",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "book_id"
+                                ],
                                 "properties": {
                                     "title": {
                                         "type": "string",
@@ -487,7 +505,7 @@
                                     },
                                     "description": {
                                         "type": "string",
-                                        "example": "A brief description of the section."
+                                        "example": "Section Description"
                                     },
                                     "book_id": {
                                         "type": "integer",
@@ -524,8 +542,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "422": {
+                        "description": "Validation error",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -536,7 +554,7 @@
                                         },
                                         "msg": {
                                             "type": "string",
-                                            "example": "Validation failed"
+                                            "example": "The given data was invalid."
                                         },
                                         "code": {
                                             "type": "integer",
@@ -549,7 +567,7 @@
                         }
                     },
                     "403": {
-                        "description": "Permission Denied",
+                        "description": "Permission denied",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -571,35 +589,16 @@
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "msg": {
-                                            "type": "string",
-                                            "example": "Error try again later!"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/sub-sections": {
+        "/api/v1/subsection/add": {
             "post": {
                 "tags": [
                     "Subsections"
@@ -762,29 +761,22 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/sections/{id}": {
-            "put": {
+        "/api/v1/section/update": {
+            "post": {
                 "tags": [
                     "Sections"
                 ],
                 "summary": "Update an existing section",
                 "description": "Updates an existing section's title and description",
                 "operationId": "updateSection",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the section to update",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
                 "requestBody": {
                     "description": "Section data",
                     "required": true,
@@ -792,6 +784,10 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "example": "111"
+                                    },
                                     "title": {
                                         "type": "string",
                                         "example": "Updated Section Title"
@@ -907,7 +903,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         }
     },
@@ -917,7 +918,9 @@
                 "type": "apiKey",
                 "description": "Enter token in format (Bearer <token>)",
                 "name": "Authorization",
-                "in": "header"
+                "in": "header",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             },
             "0": []
         }

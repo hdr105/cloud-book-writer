@@ -25,7 +25,7 @@ class TokenMiddleware
             if (strpos($token, 'Bearer ') === 0) {
                 $token = substr($token, 7);
                 $valid = false;
-                $tokenData = PersonalAccessToken::where('token', "9fa0e9a55e4450b731e165b89f1ea2054fe25de00d210c5b334fc54f6d5b0de5")->first();
+                $tokenData = PersonalAccessToken::where('token', $token)->first();
                 if ($tokenData) {
                     $valid = true;
                 }
