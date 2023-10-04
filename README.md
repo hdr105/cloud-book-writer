@@ -10,8 +10,8 @@ Book Store Cloud is a web application built with Laravel PHP. A dynamic platform
 
 - **User Registration and Profiles:** Create personalized profiles, providing information about themselves, their literary works, and reading preferences.
 - **Book Management for Authors:** Can easily add, edit, and manage their books.
-- **Search and Browse:** can search for books by genre, author, title, or keywords.
-- **Author-Reader Interaction:** Authors can engage with their readers through comments, messages.
+- **Ease to Access:** Both author and collaborator can access book data easily
+- **Role based Permissions:** Both author and collaborator can get access to features as per role assign to them.
 - **Mobile Accessibility:** Can access anywhere and anytime.
 
 ## Installation
@@ -124,7 +124,7 @@ $ php artisan make:seeder UserSeeder
 
 Configure environment variables:
 
-In `.env` file, Update the file with your own database credentials and other necessary configurations. Generate application key:
+Create a copy of the `.env.example` file and rename it to `.env`. In `.env` file, Update the file with your own database credentials and other necessary configurations. Generate application key:
 
 ```sh
 php artisan key:generate

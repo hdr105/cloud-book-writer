@@ -10,14 +10,14 @@
         "version": "1.0"
     },
     "paths": {
-        "/api/v1/auth/register": {
+        "/api/v1/auth/registerAuthor": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Register a new user",
-                "description": "Registers a new user and returns an access token.",
-                "operationId": "registerUser",
+                "summary": "Register a new Author",
+                "description": "Registers a new Author and returns an access token.",
+                "operationId": "registerAuthor",
                 "requestBody": {
                     "description": "User data",
                     "required": true,
@@ -27,7 +27,51 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "Collaborator John Doe"
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User registered successfully"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/registerCollaborator": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new Collaborator",
+                "description": "Registers a new Collaborator and returns an access token.",
+                "operationId": "registerCollaborator",
+                "requestBody": {
+                    "description": "User data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
                                     },
                                     "email": {
                                         "type": "string",
@@ -87,172 +131,6 @@
                 "responses": {
                     "200": {
                         "description": "User logged in successfully"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    }
-                }
-            }
-        },
-        "/api/v1/auth/forgot/send-reset-otp": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Send a reset OTP",
-                "description": "Sends a one-time password (OTP) to the user's email for password reset.",
-                "operationId": "sendResetOTP",
-                "requestBody": {
-                    "description": "User email",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "john@example.com"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OTP sent successfully"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "User not found"
-                    }
-                }
-            }
-        },
-        "/api/v1/auth/forgot/verify-otp": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Verify OTP",
-                "description": "Verifies the one-time password (OTP) sent to the user's email.",
-                "operationId": "verifyOTP",
-                "requestBody": {
-                    "description": "User email and OTP",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "john@example.com"
-                                    },
-                                    "otp": {
-                                        "type": "integer",
-                                        "example": 123456
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OTP verified successfully"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "User not found or OTP expired"
-                    }
-                }
-            }
-        },
-        "/api/v1/auth/forgot/reset": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Reset password",
-                "description": "Resets the user's password using the provided OTP.",
-                "operationId": "resetPassword",
-                "requestBody": {
-                    "description": "User email and new password",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "john@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "password"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Password reset successfully"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "User not found or OTP expired"
-                    }
-                }
-            }
-        },
-        "/api/v1/auth/account-delete": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Delete user account",
-                "description": "Deletes the user account.",
-                "operationId": "deleteUserAccount",
-                "requestBody": {
-                    "description": "User credentials",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "example": "john@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "password"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User account deleted successfully"
                     },
                     "400": {
                         "description": "Bad Request"

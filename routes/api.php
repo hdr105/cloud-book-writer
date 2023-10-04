@@ -33,14 +33,9 @@ use OpenApi\Annotations as OA;
 Route::prefix('v1')->group(function () {
     //---------------------------------------------------------------------------------------------------------//
     Route::prefix('auth')->group(function () {
-        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/registerAuthor', [AuthController::class, 'registerAuthor']);
+        Route::post('/registerCollaborator', [AuthController::class, 'registerCollaborator']);
         Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/account-delete', [AuthController::class, 'accountDelete']);
-        Route::prefix('forgot')->group(function () {
-            Route::post('/send-reset-otp', [AuthController::class, 'send_reset_otp']);
-            Route::post('/verify-otp', [AuthController::class, 'verify_otp']);
-            Route::post('/reset', [AuthController::class, 'reset']);
-        });
     });
     //---------------------------------------------------------------------------------------------------------//
     Route::middleware(['auth:sanctum'])->group(function () {
